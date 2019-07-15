@@ -3,4 +3,15 @@ type User {
   name: String!
   email: String!
 }
- 
+
+type Product {
+  id: ID! @id
+  title: String!
+  description: String!
+  image: String
+  largeImage: String
+  price: Float!
+  #  createdAt: DateTime!
+  #  updatedAt: DateTime!
+  #  user: User!
+}
