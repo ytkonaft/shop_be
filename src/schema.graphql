@@ -10,10 +10,20 @@ type Mutation {
     largeImage: String
     price: Float!
   ): Product!
+
+  updateProduct(
+    id: ID!
+    title: String
+    description: String
+    image: Upload
+    largeImage: String
+    price: Float
+  ): Product!
+
   uploadFile(file: Upload!): File!
 }
 
 type Query {
   products: [Product]!
-  product(id: String): Product!
+  product(where: ProductWhereUniqueInput!): Product
 }
