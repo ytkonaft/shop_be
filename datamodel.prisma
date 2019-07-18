@@ -4,6 +4,16 @@ type User {
   email: String!
 }
 
+type File {
+  id: ID! @id
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  filename: String!
+  mimetype: String!
+  encoding: String!
+  url: String! @unique
+}
+
 type Product {
   id: ID! @id
   title: String!

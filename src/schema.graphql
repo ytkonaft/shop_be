@@ -1,13 +1,16 @@
 # import * from './generated/prisma.graphql'
 
+scalar Upload
+
 type Mutation {
   createProduct(
     title: String!
     description: String!
-    image: String
+    image: Upload!
     largeImage: String
     price: Float!
   ): Product!
+  uploadFile(file: Upload!): File!
 }
 
 type Query {
