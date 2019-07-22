@@ -4,8 +4,9 @@ const Mutations = {
   async createProduct(parent, args, ctx, info) {
     // TODO: Check auth
     const { image, ...rest } = args;
-    const imageUrl = await processUpload(await image, ctx);
-
+    // TODO: IMAGE VALIDATION
+    const imageUrl = image ? await processUpload(await image, ctx) : null;
+    console.log(imageUrl);
     const product = await ctx.db.mutation.createProduct(
       {
         data: {
