@@ -6,7 +6,7 @@ type Mutation {
   createProduct(
     title: String!
     description: String!
-    image: Upload!
+    image: Upload
     largeImage: String
     price: Float!
   ): Product!
@@ -19,6 +19,8 @@ type Mutation {
     largeImage: String
     price: Float
   ): Product!
+
+  deleteProduct(id: ID!): Product!
 
   uploadFile(file: Upload!): File!
 }

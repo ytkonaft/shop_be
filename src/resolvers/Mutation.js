@@ -23,9 +23,31 @@ const Mutations = {
     return await processUpload(await file, ctx);
   },
 
-  updateProduct(parent, args, ctx, info) {
-    const updated = { ...args };
-    console.log(updated);
+  async deleteProduct(parent, args, ctx, info) {
+    const where = { id: args.id };
+    const product = await ctx.db.query.product({ where }, info);
+    // TODO CHECK PERMISSION
+    return ctx.db.mutation.deleteProduct({ where }, info);
+  },
+
+  async updateProduct(parent, args, ctx, info) {
+    const { image, id, ...updated } = args;
+
+    if (!image) {
+      updated.image = null;
+    } else if (typeof image === "string" || image instanceof String) {
+      updated.image = image;
+    } else {
+      updated.image = await processUpload(await image, ctx);
+    }
+
+    const product = await ctx.db.mutation.updateProduct({
+      data: updated,
+      where: {
+        id: args.id
+      }
+    });
+    return product;
   }
 };
 
