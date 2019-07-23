@@ -18,8 +18,14 @@ const Mutations = {
     );
     return product;
   },
+
   async uploadFile(parent, { file }, ctx, info) {
     return await processUpload(await file, ctx);
+  },
+
+  updateProduct(parent, args, ctx, info) {
+    const updated = { ...args };
+    console.log(updated);
   }
 };
 
