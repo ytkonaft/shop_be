@@ -28,4 +28,5 @@ type Mutation {
 type Query {
   products: [Product]!
   product(where: ProductWhereUniqueInput!): Product
+  productsConnection(where: ProductWhereInput): ProductConnection!
 }
