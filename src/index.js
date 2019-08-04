@@ -1,10 +1,14 @@
 require("dotenv").config({ path: ".env" });
+const cookieParser = require("cookie-parser");
 const createServer = require("./createServer");
 const db = require("./db");
+const jwtDecode = require("./middleware/jwt");
 
 const server = createServer();
 
-//////////////////////////// Use express middleware here
+server.express.use(cookieParser());
+
+server.express.use(jwtDecode);
 
 server.start(
   {

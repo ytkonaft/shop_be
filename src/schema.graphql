@@ -2,6 +2,13 @@
 
 scalar Upload
 
+type UserPublicData {
+  id: ID!
+  name: String!
+  email: String!
+  permissions: [Permission!]!
+}
+
 type Mutation {
   createProduct(
     title: String!
@@ -23,10 +30,19 @@ type Mutation {
   deleteProduct(id: ID!): Product!
 
   uploadFile(file: Upload!): File!
+
+  signUp(email: String!, password: String!, name: String): UserPublicData!
 }
 
 type Query {
-  products: [Product]!
+  products(
+    where: ProductWhereInput
+    orderBy: ProductOrderByInput
+    skip: Int
+    first: Int
+  ): [Product]!
   product(where: ProductWhereUniqueInput!): Product
   productsConnection(where: ProductWhereInput): ProductConnection!
+  me: UserPublicData
+  signIn(email: String!, password: String!): UserPublicData
 }

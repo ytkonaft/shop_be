@@ -1,3 +1,5 @@
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const { processUpload } = require("../modules/fileApi");
 
 const Mutations = {
@@ -48,6 +50,28 @@ const Mutations = {
       }
     });
     return product;
+  },
+  async signUp(parent, args, ctx, info) {
+    args.email = args.email.toLowerCase();
+    const password = await bcrypt.hash(args.password, 10);
+    const user = await ctx.db.mutation.createUser(
+      {
+        data: {
+          ...args,
+          password,
+          permissions: { set: ["USER"] }
+        }
+      },
+      info
+    );
+    // TODO: Move to utils
+    const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
+    ctx.response.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 3 // 3 days coockie life
+    });
+
+    return user;
   }
 };
 
