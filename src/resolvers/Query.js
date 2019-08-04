@@ -27,12 +27,12 @@ const Query = {
       }
     });
     if (!user) {
-      throw Error("Email or password is not correct");
+      throw new Error("Email or password is not correct");
       return null;
     }
 
     if (bcrypt.hash(password, 10) !== user.password) {
-      throw Error("Email or password is not correct");
+      throw new Error("Email or password is not correct");
       return null;
     }
 
