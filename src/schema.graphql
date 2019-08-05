@@ -2,6 +2,10 @@
 
 scalar Upload
 
+type Message {
+  message: String
+}
+
 type UserPublicData {
   id: ID!
   name: String!
@@ -32,6 +36,8 @@ type Mutation {
   uploadFile(file: Upload!): File!
 
   signUp(email: String!, password: String!, name: String): UserPublicData!
+
+  signOut: Message
 }
 
 type Query {
