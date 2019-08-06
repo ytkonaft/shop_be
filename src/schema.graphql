@@ -37,6 +37,8 @@ type Mutation {
 
   signUp(email: String!, password: String!, name: String): UserPublicData!
 
+  signIn(email: String!, password: String!): UserPublicData
+
   signOut: Message
 }
 
@@ -50,5 +52,4 @@ type Query {
   product(where: ProductWhereUniqueInput!): Product
   productsConnection(where: ProductWhereInput): ProductConnection!
   me: UserPublicData
-  signIn(email: String!, password: String!): UserPublicData
 }
