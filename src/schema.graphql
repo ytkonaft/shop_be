@@ -40,6 +40,14 @@ type Mutation {
   signIn(email: String!, password: String!): UserPublicData
 
   signOut: Message
+
+  requestPasswordReset(email: String!): Message
+
+  resetPassword(
+    password: String!
+    confirm: String!
+    resetToken: String!
+  ): UserPublicData
 }
 
 type Query {

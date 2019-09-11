@@ -1,6 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { processUpload } = require("../modules/fileApi");
+const { randomBytes } = require("crypto");
+const { promisify } = require("util");
 
 const Mutations = {
   async createProduct(parent, args, ctx, info) {
@@ -106,6 +108,71 @@ const Mutations = {
   signOut(parent, args, ctx, info) {
     ctx.response.clearCookie("token");
     return { message: "Logged out" };
+  },
+  signOut(parent, args, ctx, info) {
+    ctx.response.clearCookie("token");
+    return { message: "Logged out" };
+  },
+  async requestPasswordReset(parent, args, ctx, info) {
+    //check user
+    const user = await ctx.db.query.user({ where: { email: args.email } });
+
+    if (!user) {
+      throw new Error(`User not found`);
+    }
+
+    const resetToken = (await promisify(randomBytes)(20)).toString("hex");
+    const resetTokenExpiry = Date.now() + 3600000; // 1hour
+
+    const resp = await ctx.db.mutation.updateUser({
+      where: {
+        email: args.email
+      },
+      data: {
+        resetToken,
+        resetTokenExpiry
+      }
+    });
+
+    //TODO send email
+
+    return { message: "Check your email" };
+  },
+  async resetPassword(parent, args, ctx, info) {
+    if (args.password !== args.confirm) {
+      throw new Error("Passwords are not match");
+    }
+
+    const [user] = await ctx.db.query.users({
+      where: { resetToken: args.resetToken }
+    });
+
+    if (!user) {
+      throw new Error("Token is not valid");
+    }
+
+    const isTokenNotAlive = user.resetTokenExpiry < Date.now();
+
+    if (isTokenNotAlive) {
+      throw new Error("Token is dead");
+    }
+
+    const password = await bcrypt.hash(args.password, 10);
+
+    const userUpdate = await ctx.db.mutation.updateUser({
+      where: { id: user.id },
+      data: {
+        password
+      }
+    });
+
+    const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
+    ctx.response.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 3 // 3 days coockie life
+    });
+
+    return userUpdate;
   }
 };
 
