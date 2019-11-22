@@ -1,8 +1,9 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { processUpload } = require("../modules/fileApi");
 const { randomBytes } = require("crypto");
 const { promisify } = require("util");
+const { processUpload } = require("../modules/fileApi");
+const { transport, mailTemplate } = require("../mail");
 
 const Mutations = {
   async createProduct(parent, args, ctx, info) {
@@ -133,9 +134,14 @@ const Mutations = {
         resetTokenExpiry
       }
     });
-
     //TODO send email
-
+    const mailRespose = await transport.sendMail({
+      from: "azazaz@ololol.lol",
+      to: user.email,
+      subject: "Reset password",
+      html: mailTemplate(resetToken)
+    });
+    console.log(mailRespose);
     return { message: "Check your email" };
   },
   async resetPassword(parent, args, ctx, info) {
@@ -144,25 +150,24 @@ const Mutations = {
     }
 
     const [user] = await ctx.db.query.users({
-      where: { resetToken: args.resetToken }
+      where: {
+        resetToken: args.resetToken,
+        resetTokenExpiry_gte: Date.now() - 36000000
+      }
     });
 
     if (!user) {
       throw new Error("Token is not valid");
     }
 
-    const isTokenNotAlive = user.resetTokenExpiry < Date.now();
-
-    if (isTokenNotAlive) {
-      throw new Error("Token is dead");
-    }
-
     const password = await bcrypt.hash(args.password, 10);
 
-    const userUpdate = await ctx.db.mutation.updateUser({
+    const updatedUser = await ctx.db.mutation.updateUser({
       where: { id: user.id },
       data: {
-        password
+        password,
+        resetToken: null,
+        resetTokenExpiry: null
       }
     });
 
@@ -172,7 +177,7 @@ const Mutations = {
       maxAge: 1000 * 60 * 60 * 24 * 3 // 3 days coockie life
     });
 
-    return userUpdate;
+    return updatedUser;
   }
 };
 
